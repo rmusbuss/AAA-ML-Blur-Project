@@ -9,6 +9,10 @@ activate:
 	@echo "Activating virtual environment..."
 	poetry shell
 
+## Create JH-kernel
+kernel:
+	poetry run ipython kernel install --user --name=blur
+
 ## Setup project
 setup: install activate
 
