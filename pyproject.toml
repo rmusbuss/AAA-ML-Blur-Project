@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Тема: 04. Background Blur / Crop / Face Blur / Замена Фона"
 authors = [
     "Ruslan Melnic <rmusbuss@gmail.com>",
-    "Yaroslav Nikolaev <>",
+    "Yaroslav Nikolaev <yarik.nikk@mail.ru>",
     "Donskoi Andrei <donskoi.ae@gmail.com>",
 ]
 packages = [
