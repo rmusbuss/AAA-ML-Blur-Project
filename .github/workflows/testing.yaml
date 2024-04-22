@@ -24,7 +24,7 @@ jobs:
         uses: snok/install-poetry@v1
 
       - name: Create environment
-        run: make setup
+        run: make install
 
       - name: Run tests
         run: make tests
