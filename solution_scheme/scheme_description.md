@@ -108,4 +108,4 @@
 - Размеченные фотографии, то есть наличие масок к изображениям (релевантный для нас датасет [тут](https://www.kaggle.com/datasets/kapitanov/easyportrait))
 5. **Схема решения**
 
-![solution_scheme.png](https://drive.google.com/file/d/16OzQFeJ0d9ZmQhMUUSHXIKdOR6kc3REf/view?usp=share_link)
+![solution_scheme.png](https://raw.githubusercontent.com/rmusbuss/AAA-ML-Blur-Project/main/solution_scheme/First_v_solution_scheme.png)
