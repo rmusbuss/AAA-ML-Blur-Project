@@ -11,9 +11,9 @@ class Cascade:
         )
         
         self.predict_params = {
-            "scaleFactor": 1.1,
-            "minNeighbors": 5,
-            "minSize": (30, 30),
+            "scaleFactor": 1.21,
+            "minNeighbors": 9,
+            "minSize": (34, 54),
         }
 
         if predict_params is not None:
