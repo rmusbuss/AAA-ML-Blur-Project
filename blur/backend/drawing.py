@@ -1,8 +1,10 @@
 import os
 import random
 from tqdm import tqdm
+import pandas as pd
 from PIL import ImageDraw
 import matplotlib.pyplot as plt
+from matplotlib import patches
 import numpy as np
 from datasets import DatasetDict
 
@@ -64,4 +66,43 @@ def plot_categories(data: dict, suptitle: str):
         
     plt.suptitle(suptitle, fontsize=16)
     plt.tight_layout()
+    plt.show()
+
+
+def draw_predicted_bboxes(
+    dataset: DatasetDict, original: pd.DataFrame, preds: pd.DataFrame, 
+    n_images: int = 4,
+):
+    
+    img_ids = random.sample(original['img_id'].unique().tolist(), n_images)
+    fig, axs = plt.subplots(n_images, 2, figsize=(6, n_images * 2))
+    coords = ["xmin", "ymin", "width", "height"]
+    
+    for irow, img_id in enumerate(img_ids):
+        img = dataset['validation'][img_id]['image']
+        bboxes = {
+            'Original bbox': (
+                'green',
+                original.query(f"img_id == {img_id}")[coords].values,
+            ),
+            'Predicted bbox': (
+                'red',
+                preds.query(f"img_id == {img_id}")[coords].values,
+            )
+        }
+        
+        for icol, (title, (color, faces)) in enumerate(bboxes.items()):    
+            axs[irow, icol].imshow(img)
+            axs[irow, icol].set_title(title)
+            axs[irow, icol].axis('off')
+            
+            for (x, y, width, height) in faces:
+                rect = patches.Rectangle(
+                    (x, y), width, height, 
+                    linewidth=2, edgecolor=color, facecolor='none',
+                )
+                axs[irow, icol].add_patch(rect)
+    
+    plt.tight_layout()
+    plt.savefig('../data/preds.png')
     plt.show()

@@ -8,6 +8,7 @@ DATA_PATH = PROJECT_ROOT / "data"
 DOCKER_PATH = PROJECT_ROOT / "docker"
 WIDER_FACE_PATH = DATA_PATH / "WIDER_FACE"
 CUSTOM_FACE_PATH = DATA_PATH / "CUSTOM_FACE"
+CASCADE_XML = "haarcascade_frontalface_default.xml"
 
 # Constants
 SEED = 42

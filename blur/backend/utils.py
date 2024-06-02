@@ -4,8 +4,9 @@ from tqdm import tqdm
 from PIL import ImageDraw
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import torch
-from datasets import DatasetDict
+from datasets import DatasetDict, Dataset
 from blur.backend.config import SEED
 
 
@@ -71,3 +72,30 @@ def remove_people(dataset: DatasetDict, split: str):
         input_columns=["faces"],
     ) 
     return processed
+
+def prepare_df(dataset: Dataset) -> pd.DataFrame:
+    features = [
+        "blur", "expression", "illumination", 
+        "occlusion", "pose", "invalid",
+   ]
+    df = pd.DataFrame(dataset["faces"])
+    df = df.explode(
+        column=['bbox', *features]
+    ).reset_index().rename(columns={"index": "img_id"})
+    
+    df[['xmin', 'ymin', 'width', 'height']] = df["bbox"].tolist()
+    df['xmax'] = df['xmin'] + df['width']
+    df['ymax'] = df['ymin'] + df['height']
+    
+    df = df.drop(columns=["bbox"])
+    coords = ["xmin", "xmax", "ymin", "ymax", "width", "height"]
+    df["label"] = "face"
+    df = df[["img_id", "label", *coords, *features]]
+    return df
+
+
+def prepare_dfs(dataset: DatasetDict) -> dict[str, pd.DataFrame]:
+    return {
+        "train": prepare_df(dataset["train"]),
+        "validation": prepare_df(dataset["validation"]),
+    }
