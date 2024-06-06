@@ -11,7 +11,9 @@ activate:
 
 ## Create JH-kernel
 kernel:
+	@echo "Creating JH-kernel..."
 	poetry run ipython kernel install --user --name=blur
+	poetry run jupyter lab
 
 ## Setup project
 setup: install activate
