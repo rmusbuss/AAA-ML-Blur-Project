@@ -132,8 +132,9 @@ def draw_predicted_bboxes(
 
 def draw_prediction(images, all_boxes):
     """Retina (general) plot function"""
-    
-    fig, axs = plt.subplots(3, 4, figsize=[20, 15])
+
+    all_boxes = [box.cpu() for box in all_boxes]
+    fig, axs = plt.subplots(2, 3, figsize=[20, 15])
     axs = axs.flatten()
 
     for i, ax in enumerate(axs):
