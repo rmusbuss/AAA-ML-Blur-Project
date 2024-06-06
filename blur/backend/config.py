@@ -15,6 +15,10 @@ TORCH_WEIGHTS = DATA_PATH / "resnet50.pth"
 
 # Other constants
 SEED = 42
+CONFIDENCE = 0.99
+NMS_THRESHOLD = 0.4
+TOP_K = 5000
+KEEP_TOP_K = 750
 
 # Model config
 CFG = {
