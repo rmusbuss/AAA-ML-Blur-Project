@@ -3,16 +3,17 @@
 from itertools import product as product
 from math import ceil
 
-from tqdm import trange
 import cv2
 import numpy as np
 import torch
 from PIL import Image
-from blur.backend.config import CASCADE_XML, TORCH_WEIGHTS
-from blur.backend.retinaface.core import RetinaFace
 from torchvision import transforms
 from torchvision.models.detection import fasterrcnn_resnet50_fpn
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
+from tqdm import trange
+
+from blur.backend.config import CASCADE_XML, TORCH_WEIGHTS
+from blur.backend.retinaface.core import RetinaFace
 
 
 class Cascade:
@@ -36,7 +37,7 @@ class Cascade:
         self, images: list[np.ndarray], idx: np.ndarray | None = None
     ) -> list[dict]:
         """Make prediction"""
-        
+
         assert (images[0].ndim == 3) and (images[0].shape[2] == 3)
         batch_size = len(images)
         predictions = []
@@ -83,7 +84,7 @@ class FaceDetector:
         """RetinaFace Detector with 5points landmarks"""
 
         self.cfg = cfg
-        self.model = RetinaFace(cfg=self.cfg, phase='train')
+        self.model = RetinaFace(cfg=self.cfg, phase="train")
         self.model.load_state_dict(torch.load(TORCH_WEIGHTS))
         self.model.eval()
         self.device = device
@@ -98,16 +99,18 @@ class FaceDetector:
         """Process image to the necessary format"""
         W, H = img.size
         scale = torch.Tensor([W, H, W, H]).to(self.device)
-        img = img.resize((self.cfg["image_size"], self.cfg["image_size"]), Image.BILINEAR)
+        img = img.resize(
+            (self.cfg["image_size"], self.cfg["image_size"]), Image.BILINEAR
+        )
         img = torch.tensor(np.array(img), dtype=torch.float32).to(self.device)
         img -= torch.tensor([104, 117, 123]).to(self.device)
         img = img.permute(2, 0, 1)
         return img, scale
-        
+
     def detect(self, images: list):
         batch_size = len(images)
         batch, scales = [], []
-            
+
         for image in images:
             image, scale = self.pre_processor(image)
             batch.append(image)
@@ -115,17 +118,17 @@ class FaceDetector:
 
         batch = torch.stack(batch)
         scales = torch.stack(scales)
-        
+
         with torch.no_grad():
             loc, conf, landmarks = self.model(batch)
-        
+
         output = []
         for idx in trange(batch_size):
             boxes = self.post_processor(idx, loc, conf, landmarks, scales)
             output.append(boxes)
 
         return output
-          
+
     def post_processor(self, idx, loc, conf, landmarks, scales):
         priors = self.prior_box(
             image_size=(self.cfg["image_size"], self.cfg["image_size"]),
@@ -158,10 +161,10 @@ class FaceDetector:
     def prior_box(self, image_size=None):
         """
         Prior box realization
-        
+
         Source: https://github.com/fmassa/object-detection.torch
         """
-        
+
         steps = self.cfg["steps"]
         feature_maps = [
             [ceil(image_size[0] / step), ceil(image_size[1] / step)]
@@ -188,7 +191,7 @@ class FaceDetector:
         """
         Decode locations from predictions using priors to undo
         the encoding we did for offset regression at train time.
-        
+
         Source: https://github.com/Hakuyume/chainer-ssd
         """
         variances = self.cfg["variance"]

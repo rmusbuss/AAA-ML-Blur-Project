@@ -20,7 +20,7 @@ def draw_faces_with_bbox(
     hide_face: bool = True,
 ):
     """Base drawing function for dataset"""
-    
+
     if split not in ["train", "validation", "test"]:
         raise ValueError("Unexpected split.")
 
@@ -56,7 +56,7 @@ def draw_faces_with_bbox(
 
 def plot_categories(data: dict, suptitle: str):
     """Draw categories from dataset"""
-    
+
     colors = ["skyblue", "orange", "lightgreen"]
     titles = [
         "Blur",
@@ -92,7 +92,7 @@ def draw_predicted_bboxes(
     n_images: int = 4,
 ):
     """Cascade plot function"""
-    
+
     img_ids = random.sample(original["img_id"].unique().tolist(), n_images)
     fig, axs = plt.subplots(n_images, 2, figsize=(6, n_images * 2))
     coords = ["xmin", "ymin", "width", "height"]
