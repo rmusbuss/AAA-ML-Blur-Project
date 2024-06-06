@@ -12,7 +12,14 @@ from torchvision.models.detection import fasterrcnn_resnet50_fpn
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 from tqdm import trange
 
-from blur.backend.config import CASCADE_XML, TORCH_WEIGHTS
+from blur.backend.config import (
+    CASCADE_XML,
+    CONFIDENCE,
+    KEEP_TOP_K,
+    NMS_THRESHOLD,
+    TOP_K,
+    TORCH_WEIGHTS,
+)
 from blur.backend.retinaface.core import RetinaFace
 
 
@@ -76,15 +83,15 @@ class FaceDetector:
         self,
         cfg: dict,
         device=torch.device("cuda:0" if torch.cuda.is_available() else "cpu"),
-        confidence_threshold: float = 0.99,
-        nms_threshold: float = 0.4,
-        top_k: int = 5000,
-        keep_top_k: int = 750,
+        confidence_threshold: float = CONFIDENCE,
+        nms_threshold: float = NMS_THRESHOLD,
+        top_k: int = TOP_K,
+        keep_top_k: int = KEEP_TOP_K,
     ):
         """RetinaFace Detector with 5points landmarks"""
 
         self.cfg = cfg
-        self.model = RetinaFace(cfg=self.cfg, phase="train")
+        self.model = RetinaFace(cfg=self.cfg)
         self.model.load_state_dict(torch.load(TORCH_WEIGHTS))
         self.model.eval()
         self.device = device
@@ -108,6 +115,7 @@ class FaceDetector:
         return img, scale
 
     def detect(self, images: list):
+        """Entry point for prediction"""
         batch_size = len(images)
         batch, scales = [], []
 
@@ -130,6 +138,7 @@ class FaceDetector:
         return output
 
     def post_processor(self, idx, loc, conf, landmarks, scales):
+        """Post processing of images to enhance results"""
         priors = self.prior_box(
             image_size=(self.cfg["image_size"], self.cfg["image_size"]),
         ).to(self.device)
