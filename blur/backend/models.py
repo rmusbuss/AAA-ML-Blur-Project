@@ -7,9 +7,6 @@ import cv2
 import numpy as np
 import torch
 from PIL import Image
-from torchvision import transforms
-from torchvision.models.detection import fasterrcnn_resnet50_fpn
-from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 from tqdm import trange
 
 from blur.backend.config import (
@@ -19,6 +16,10 @@ from blur.backend.config import (
     NMS_THRESHOLD,
     TOP_K,
     TORCH_WEIGHTS,
+    SCALE_FACTOR,
+    MIN_NEIGHBORS,
+    MIN_SIZE,
+
 )
 from blur.backend.retinaface.core import RetinaFace
 
@@ -29,9 +30,9 @@ class Cascade:
         self.model = cv2.CascadeClassifier(cv2.data.haarcascades + CASCADE_XML)
 
         self.predict_params = {
-            "scaleFactor": 1.21,
-            "minNeighbors": 9,
-            "minSize": (34, 54),
+            "scaleFactor": SCALE_FACTOR,
+            "minNeighbors": MIN_NEIGHBORS,
+            "minSize": MIN_SIZE,
         }
 
         if predict_params is not None:
@@ -91,7 +92,7 @@ class FaceDetector:
         """RetinaFace Detector with 5points landmarks"""
 
         self.cfg = cfg
-        self.model = RetinaFace(cfg=self.cfg)
+        self.model = RetinaFace(cfg=self.cfg, phase='eval')
         self.model.load_state_dict(torch.load(TORCH_WEIGHTS))
         self.model.eval()
         self.device = device

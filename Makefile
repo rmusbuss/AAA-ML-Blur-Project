@@ -31,7 +31,7 @@ lint: pylint flake8
 
 test:
 	@echo "Running tests..."
-	poetry run pytest tests/ -v
+	poetry run pytest tests/ -v -s
 
 ## Run tests
 tests: test
