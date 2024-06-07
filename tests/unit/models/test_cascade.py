@@ -1,13 +1,11 @@
 """Tests for Haar Cascade model"""
 
-import pytest
 import cv2
 import numpy as np
+import pytest
+from blur.backend.config import (MIN_NEIGHBORS, MIN_SIZE, SCALE_FACTOR,
+                                 VALID_IMAGE_PATH)
 from blur.backend.models import Cascade
-from blur.backend.config import (
-    SCALE_FACTOR, MIN_NEIGHBORS, MIN_SIZE,
-    VALID_IMAGE_PATH,
-)
 
 
 @pytest.fixture
@@ -22,11 +20,7 @@ def test_init_with_default_params(cascade):
 
 
 def test_init_with_custom_params():
-    custom_params = {
-        "scaleFactor": 1.1,
-        "minNeighbors": 5,
-        "minSize": (30, 30)
-    }
+    custom_params = {"scaleFactor": 1.1, "minNeighbors": 5, "minSize": (30, 30)}
     cascade = Cascade(predict_params=custom_params)
     assert cascade.predict_params["scaleFactor"] == 1.1
     assert cascade.predict_params["minNeighbors"] == 5
@@ -34,7 +28,9 @@ def test_init_with_custom_params():
 
 
 def test_repr(cascade):
-    expected_repr = f"Cascade model with predict params = {cascade.predict_params}"
+    expected_repr = (
+        f"Cascade model with predict params = {cascade.predict_params}"
+    )
     assert repr(cascade) == expected_repr
 
 
@@ -95,7 +91,7 @@ def test_predict_with_valid_image(cascade):
 
     prediction = predictions[0]
 
-    assert prediction['label'] == 'face'
+    assert prediction["label"] == "face"
     assert prediction["width"] == 700
     assert prediction["height"] == 700
 

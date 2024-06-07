@@ -2,12 +2,10 @@
 
 import pytest
 import torch
-from PIL import Image
+from blur.backend.config import (CFG, CONFIDENCE, KEEP_TOP_K, NMS_THRESHOLD,
+                                 TOP_K, VALID_IMAGE_PATH)
 from blur.backend.models import FaceDetector
-from blur.backend.config import (
-    CONFIDENCE, NMS_THRESHOLD, TOP_K, KEEP_TOP_K,
-    CFG, VALID_IMAGE_PATH,
-)
+from PIL import Image
 
 
 @pytest.fixture
@@ -18,7 +16,7 @@ def face_detector():
         confidence_threshold=CONFIDENCE,
         nms_threshold=NMS_THRESHOLD,
         top_k=TOP_K,
-        keep_top_k=KEEP_TOP_K
+        keep_top_k=KEEP_TOP_K,
     )
 
 
@@ -41,7 +39,11 @@ def test_pre_processor(face_detector, img):
     processed_img, scale = face_detector.pre_processor(img)
 
     assert isinstance(processed_img, torch.Tensor)
-    assert processed_img.shape == (3, face_detector.cfg["image_size"], face_detector.cfg["image_size"])
+    assert processed_img.shape == (
+        3,
+        face_detector.cfg["image_size"],
+        face_detector.cfg["image_size"],
+    )
     assert isinstance(scale, torch.Tensor)
     assert scale.shape == (4,)
 
