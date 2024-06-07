@@ -1,6 +1,9 @@
 ## Install Python dependencies
 install:
 	@echo "Installing python dependencies..."
+	sudo apt-get install git-lfs
+	git lfs install
+	git lfs pull
 	pip install poetry==1.8.2
 	poetry install
 
@@ -31,7 +34,7 @@ lint: pylint flake8
 
 test:
 	@echo "Running tests..."
-	poetry run pytest tests/ -v
+	poetry run pytest tests/ -v -s
 
 ## Run tests
 tests: test
