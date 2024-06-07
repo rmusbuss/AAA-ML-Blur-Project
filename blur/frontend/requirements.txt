@@ -1,0 +1,3 @@
+aiohttp-jinja2==1.6
+aiohttp==3.9.3
+pillow==10.3.0

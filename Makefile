@@ -39,6 +39,20 @@ test:
 ## Run tests
 tests: test
 
+## Build
+build:
+	docker-compose up -d
+
+down:
+	docker-compose down
+
+## Build frontend
+frontend-build:
+	docker build -f docker/frontend/Dockerfile -t blur-frontend .
+	
+## Run frontend
+frontend-run:
+	docker run -p 8080:8080 blur-frontend
 
 ## Show help
 help:
