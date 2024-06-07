@@ -1,0 +1,32 @@
+name: "retinaface"
+platform: "onnxruntime_onnx"
+max_batch_size: 16
+input [
+    {
+        name: "INPUT"
+        data_type: TYPE_FP32
+        dims: [3, 840, 840]
+    }
+]
+output [
+    {
+        name: "OUTPUT0"
+        data_type: TYPE_FP32
+        dims: [29126, 4]
+    },
+    {
+        name: "OUTPUT1"
+        data_type: TYPE_FP32
+        dims: [29126, 2]
+    },
+    {
+        name: "OUTPUT2"
+        data_type: TYPE_FP32
+        dims: [29126, 10]
+    }
+]
+instance_group [
+  {
+    kind: KIND_GPU
+  }
+]

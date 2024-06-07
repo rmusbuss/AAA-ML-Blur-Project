@@ -48,19 +48,19 @@ down:
 
 ## Build backend
 backend-build:
-	docker build -f docker/backend/Dockerfile -t backend-frontend .
+	docker build -f docker/backend/Dockerfile -t blur-backend:0.1.0 .
 
 ## Run backend
 backend-run:
-	docker run -p 8001:8001 blur-backend
+	docker run -p 8001:8001 -it blur-backend:0.1.0 bash
 
 ## Build frontend
 frontend-build:
-	docker build -f docker/frontend/Dockerfile -t blur-frontend .
+	docker build -f docker/frontend/Dockerfile -t blur-frontend:0.1.0 .
 	
 ## Run frontend
 frontend-run:
-	docker run -p 8080:8080 blur-frontend
+	docker run -p 8080:8080 blur-frontend:0.1.0
 
 ## Show help
 help:

@@ -3,20 +3,16 @@ FROM nvcr.io/nvidia/tritonserver:23.04-py3
 WORKDIR /model
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends && \
-    apt-get install git-lfs
+    apt-get install -y --no-install-recommends
 
-RUN git lfs install && \
-    pip install poetry==1.8.2
+COPY docker/backend/requirements.txt .
 
-COPY poetry.lock /model
+RUN pip install --no-cache-dir -r requirements.txt
 
-COPY pyproject.toml /model
-
-RUN poetry install
-
-#COPY . .
+COPY . .
 
 EXPOSE 8001
+EXPOSE 8002
+EXPOSE 8003
 
-#CMD ["tritonserver", "--model-repository=/models"]
+#CMD ["tritonserver", "--model-repository=/models/blur/backend/triton"]
