@@ -39,6 +39,28 @@ test:
 ## Run tests
 tests: test
 
+## Build
+build:
+	docker-compose up -d
+
+down:
+	docker-compose down
+
+## Build backend
+backend-build:
+	docker build -f docker/backend/Dockerfile -t blur-backend:0.1.0 . 
+
+## Run backend
+backend-run:
+	docker run -p 8001:8001 -it blur-backend:0.1.0 bash
+
+## Build frontend
+frontend-build:
+	docker build -f docker/frontend/Dockerfile -t blur-frontend:0.1.0 .
+	
+## Run frontend
+frontend-run:
+	docker run -p 8080:8080 blur-frontend:0.1.0
 
 ## Show help
 help:

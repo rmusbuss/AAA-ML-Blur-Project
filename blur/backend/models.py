@@ -6,8 +6,11 @@ from math import ceil
 import cv2
 import numpy as np
 import torch
-from PIL import Image
+from blur.backend.config import CASCADE_XML, TORCH_WEIGHTS
+from blur.backend.retinaface.core import RetinaFace
 from tqdm import trange
+
+from PIL import Image
 
 from blur.backend.config import (
     CASCADE_XML,
@@ -16,10 +19,6 @@ from blur.backend.config import (
     NMS_THRESHOLD,
     TOP_K,
     TORCH_WEIGHTS,
-    SCALE_FACTOR,
-    MIN_NEIGHBORS,
-    MIN_SIZE,
-
 )
 from blur.backend.retinaface.core import RetinaFace
 
@@ -30,9 +29,9 @@ class Cascade:
         self.model = cv2.CascadeClassifier(cv2.data.haarcascades + CASCADE_XML)
 
         self.predict_params = {
-            "scaleFactor": SCALE_FACTOR,
-            "minNeighbors": MIN_NEIGHBORS,
-            "minSize": MIN_SIZE,
+            "scaleFactor": 1.21,
+            "minNeighbors": 9,
+            "minSize": (34, 54),
         }
 
         if predict_params is not None:
@@ -45,7 +44,7 @@ class Cascade:
         self, images: list[np.ndarray], idx: np.ndarray | None = None
     ) -> list[dict]:
         """Make prediction"""
-
+        
         assert (images[0].ndim == 3) and (images[0].shape[2] == 3)
         batch_size = len(images)
         predictions = []
@@ -88,22 +87,29 @@ class FaceDetector:
         nms_threshold: float = NMS_THRESHOLD,
         top_k: int = TOP_K,
         keep_top_k: int = KEEP_TOP_K,
+        is_infer=False
     ):
         """RetinaFace Detector with 5points landmarks"""
+        RetinaFace = None
+        TORCH_WEIGHTS = None
 
         self.cfg = cfg
-        self.model = RetinaFace(cfg=self.cfg, phase='eval')
-        self.model.load_state_dict(torch.load(TORCH_WEIGHTS))
-        self.model.eval()
+        self.is_infer = is_infer
         self.device = device
-        self.model = self.model.to(self.device)
+
+        if not self.is_infer:
+            self.model = RetinaFace(cfg=self.cfg)
+            self.model.load_state_dict(torch.load(TORCH_WEIGHTS))
+            self.model = self.model.to(self.device)
+        else:
+            self.model = None
 
         self.confidence_threshold = confidence_threshold
         self.nms_thresh = nms_threshold
         self.top_k = top_k
         self.keep_top_k = keep_top_k
 
-    def pre_processor(self, img) -> tuple[torch.Tensor, list]:
+    def pre_processor(self, img):
         """Process image to the necessary format"""
         W, H = img.size
         scale = torch.Tensor([W, H, W, H]).to(self.device)
@@ -114,29 +120,6 @@ class FaceDetector:
         img -= torch.tensor([104, 117, 123]).to(self.device)
         img = img.permute(2, 0, 1)
         return img, scale
-
-    def detect(self, images: list):
-        """Entry point for prediction"""
-        batch_size = len(images)
-        batch, scales = [], []
-
-        for image in images:
-            image, scale = self.pre_processor(image)
-            batch.append(image)
-            scales.append(scale)
-
-        batch = torch.stack(batch)
-        scales = torch.stack(scales)
-
-        with torch.no_grad():
-            loc, conf, landmarks = self.model(batch)
-
-        output = []
-        for idx in trange(batch_size):
-            boxes = self.post_processor(idx, loc, conf, landmarks, scales)
-            output.append(boxes)
-
-        return output
 
     def post_processor(self, idx, loc, conf, landmarks, scales):
         """Post processing of images to enhance results"""
@@ -168,13 +151,36 @@ class FaceDetector:
 
         return boxes
 
+    def detect(self, images: list):
+        """Entry point for prediction"""
+        batch_size = len(images)
+        batch, scales = [], []
+
+        for image in images:
+            image, scale = self.pre_processor(image)
+            batch.append(image)
+            scales.append(scale)
+
+        batch = torch.stack(batch)
+        scales = torch.stack(scales)
+
+        with torch.no_grad():
+            loc, conf, landmarks = self.model(batch)
+
+        output = []
+        for idx in trange(batch_size):
+            boxes = self.post_processor(idx, loc, conf, landmarks, scales)
+            output.append(boxes)
+
+        return output
+    
     def prior_box(self, image_size=None):
         """
         Prior box realization
-
+        
         Source: https://github.com/fmassa/object-detection.torch
         """
-
+        
         steps = self.cfg["steps"]
         feature_maps = [
             [ceil(image_size[0] / step), ceil(image_size[1] / step)]
@@ -201,7 +207,7 @@ class FaceDetector:
         """
         Decode locations from predictions using priors to undo
         the encoding we did for offset regression at train time.
-
+        
         Source: https://github.com/Hakuyume/chainer-ssd
         """
         variances = self.cfg["variance"]
