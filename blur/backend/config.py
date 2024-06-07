@@ -12,6 +12,7 @@ WIDER_FACE_PATH = DATA_PATH / "WIDER_FACE"
 CUSTOM_FACE_PATH = DATA_PATH / "CUSTOM_FACE"
 CASCADE_XML = "haarcascade_frontalface_default.xml"
 TORCH_WEIGHTS = DATA_PATH / "resnet50.pth"
+VALID_IMAGE_PATH = DATA_PATH / "valid_image.jpg"
 
 # Other constants
 SEED = 42
@@ -19,6 +20,9 @@ CONFIDENCE = 0.99
 NMS_THRESHOLD = 0.4
 TOP_K = 5000
 KEEP_TOP_K = 750
+SCALE_FACTOR = 1.21
+MIN_NEIGHBORS = 9
+MIN_SIZE = (34, 54)
 
 # Model config
 CFG = {
