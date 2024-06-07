@@ -2,18 +2,23 @@
 
 import os
 import random
+from typing import Iterable
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import torch
-from blur.backend.config import SEED
 from datasets import Dataset, DatasetDict
-from PIL import ImageDraw
 from tqdm import tqdm, trange
+
+from blur.backend.config import SEED
 
 
 def seed_everything(seed: int = SEED):
+    """
+    Seed further code
+
+    :param seed: seed value
+    """
     random.seed(seed)
     os.environ["PYTHONHASHSEED"] = str(seed)
     np.random.seed(seed)
@@ -25,6 +30,13 @@ def seed_everything(seed: int = SEED):
 
 
 def calculate_unique(dataset: DatasetDict) -> dict:
+    """
+    Calculate unique values in dataset
+
+    :param dataset: dataset with train, validation parts
+    :return:
+        Dict with unique values
+    """
     unique = {}
     for split in ["train", "validation"]:
         unique[split] = {
@@ -43,7 +55,14 @@ def calculate_unique(dataset: DatasetDict) -> dict:
     return unique
 
 
-def invalid_filter(batch) -> list[bool]:
+def invalid_filter(batch: Iterable) -> list[bool]:
+    """
+    Leave only invalid images
+
+    :param batch: batch from dataset
+    :return:
+        List of bool values, True if images is invalid
+    """
     results = []
     for item in batch:
         condition = all(face == 1 for face in item["invalid"])
@@ -52,14 +71,21 @@ def invalid_filter(batch) -> list[bool]:
     return results
 
 
-def custom_filter(batch) -> list[bool]:
+def custom_filter(batch: Iterable) -> list[bool]:
+    """
+    Leave only correct images
+
+    :param batch: batch from dataset
+    :return:
+        List of bool values, True if images is invalid
+    """
     results = []
     for item in batch:
         if (
             (len(item["bbox"]) < 3)
             and (len(item["bbox"]) > 0)
             and (all(face == 0 for face in item["invalid"]))
-            and (all(all([coo != 0 for coo in bbox]) for bbox in item["bbox"]))
+            and all(coo != 0 for bbox in item["bbox"] for coo in bbox)
         ):
             results.append(True)
         else:
@@ -68,7 +94,15 @@ def custom_filter(batch) -> list[bool]:
     return results
 
 
-def remove_people(dataset: DatasetDict, split: str):
+def remove_people(dataset: DatasetDict, split: str) -> Dataset:
+    """
+    Process dataset to leave only valid images
+
+    :param dataset: dataset dict to process
+    :param split: split (train or validation)
+    :return:
+        Processed dataset
+    """
     processed = dataset[split].filter(
         custom_filter,
         batched=True,
@@ -80,6 +114,13 @@ def remove_people(dataset: DatasetDict, split: str):
 
 
 def prepare_df(dataset: Dataset) -> pd.DataFrame:
+    """
+    Prepare DataFrame with image info
+
+    :param dataset: dataset to process
+    :return:
+        DataFrame with image information
+    """
     features = [
         "blur",
         "expression",
@@ -122,6 +163,13 @@ def prepare_df(dataset: Dataset) -> pd.DataFrame:
 
 
 def prepare_dfs(dataset: DatasetDict) -> dict[str, pd.DataFrame]:
+    """
+    Prepare DatasetDict with image info
+
+    :param dataset: DatasetDict to process
+    :return:
+        Dict with processed DataFrames
+    """
     return {
         "train": prepare_df(dataset["train"]),
         "validation": prepare_df(dataset["validation"]),

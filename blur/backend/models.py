@@ -1,6 +1,6 @@
 """Models Core"""
 
-from itertools import product as product
+from itertools import product
 from math import ceil
 
 import cv2
@@ -19,14 +19,15 @@ from blur.backend.config import (
     SCALE_FACTOR,
     MIN_NEIGHBORS,
     MIN_SIZE,
-
 )
 from blur.backend.retinaface.core import RetinaFace
 
 
 class Cascade:
+    """Haar Cascade using OpenCV"""
+
     def __init__(self, predict_params: dict | None = None):
-        """Haar Cascade using OpenCV"""
+
         self.model = cv2.CascadeClassifier(cv2.data.haarcascades + CASCADE_XML)
 
         self.predict_params = {
@@ -42,9 +43,16 @@ class Cascade:
         return f"Cascade model with predict params = {self.predict_params}"
 
     def predict(
-        self, images: list[np.ndarray], idx: np.ndarray | None = None
+        self, images: list[np.ndarray], idx: np.ndarray | None = None,
     ) -> list[dict]:
-        """Make prediction"""
+        """
+        Find faces
+
+        :param images: list on images in np.ndarray
+        :param idx: image idx (optional)
+        :return:
+            List of faces info for all images
+        """
 
         assert (images[0].ndim == 3) and (images[0].shape[2] == 3)
         batch_size = len(images)
@@ -80,6 +88,8 @@ class Cascade:
 
 
 class FaceDetector:
+    """Face Detector model based on RetinaFace"""
+
     def __init__(
         self,
         cfg: dict,
@@ -89,10 +99,8 @@ class FaceDetector:
         top_k: int = TOP_K,
         keep_top_k: int = KEEP_TOP_K,
     ):
-        """RetinaFace Detector with 5points landmarks"""
-
         self.cfg = cfg
-        self.model = RetinaFace(cfg=self.cfg, phase='eval')
+        self.model = RetinaFace(cfg=self.cfg, phase="eval")
         self.model.load_state_dict(torch.load(TORCH_WEIGHTS))
         self.model.eval()
         self.device = device
@@ -103,10 +111,17 @@ class FaceDetector:
         self.top_k = top_k
         self.keep_top_k = keep_top_k
 
-    def pre_processor(self, img) -> tuple[torch.Tensor, list]:
-        """Process image to the necessary format"""
-        W, H = img.size
-        scale = torch.Tensor([W, H, W, H]).to(self.device)
+    def pre_processor(self, img: Image) -> tuple[torch.Tensor, torch.Tensor]:
+        """
+        Pre-process image to the necessary format
+
+        :param img: PIL Image
+        :return:
+            Scaled image and scale info
+        """
+
+        width, height = img.size
+        scale = torch.Tensor([width, height, width, height]).to(self.device)
         img = img.resize(
             (self.cfg["image_size"], self.cfg["image_size"]), Image.BILINEAR
         )
@@ -115,8 +130,15 @@ class FaceDetector:
         img = img.permute(2, 0, 1)
         return img, scale
 
-    def detect(self, images: list):
-        """Entry point for prediction"""
+    def detect(self, images: list) -> list:
+        """
+        Entry point for prediction
+
+        :param images: list of PIL images
+        :return:
+            List of predictions [boxes]
+        """
+
         batch_size = len(images)
         batch, scales = [], []
 
@@ -129,20 +151,29 @@ class FaceDetector:
         scales = torch.stack(scales)
 
         with torch.no_grad():
-            loc, conf, landmarks = self.model(batch)
+            model_output = self.model(batch)
 
         output = []
         for idx in trange(batch_size):
-            boxes = self.post_processor(idx, loc, conf, landmarks, scales)
+            boxes = self.post_processor(idx, model_output, scales)
             output.append(boxes)
 
         return output
 
-    def post_processor(self, idx, loc, conf, landmarks, scales):
-        """Post processing of images to enhance results"""
-        priors = self.prior_box(
-            image_size=(self.cfg["image_size"], self.cfg["image_size"]),
-        ).to(self.device)
+    def post_processor(
+        self, idx: int, model_output: tuple, scales: torch.Tensor,
+    ) -> torch.Tensor:
+        """
+        Post-processing of images to enhance results
+
+        :param idx: image id
+        :param model_output: result of self.model(batch)
+        :param scales: scales info from `pre-processor`
+        :return:
+            Boxes with faces on image
+        """
+        loc, conf, _ = model_output
+        priors = self.prior_box().to(self.device)
         boxes = self.decode(loc.data[idx], priors)
         boxes = boxes * scales[idx]
         scores = conf[idx][:, 1]
@@ -168,13 +199,12 @@ class FaceDetector:
 
         return boxes
 
-    def prior_box(self, image_size=None):
+    def prior_box(self):
         """
-        Prior box realization
-
+        Prior-box realization
         Source: https://github.com/fmassa/object-detection.torch
         """
-
+        image_size = (self.cfg["image_size"], self.cfg["image_size"])
         steps = self.cfg["steps"]
         feature_maps = [
             [ceil(image_size[0] / step), ceil(image_size[1] / step)]
@@ -197,12 +227,16 @@ class FaceDetector:
         output = torch.Tensor(anchors).view(-1, 4)
         return output
 
-    def decode(self, loc, priors):
+    def decode(self, loc: torch.Tensor, priors: torch.Tensor) -> torch.Tensor:
         """
         Decode locations from predictions using priors to undo
         the encoding we did for offset regression at train time.
-
         Source: https://github.com/Hakuyume/chainer-ssd
+
+        :param loc: locations
+        :param priors: result of self.prior_box()
+        :return:
+            Decoded boxes
         """
         variances = self.cfg["variance"]
         boxes = torch.cat(
@@ -217,8 +251,16 @@ class FaceDetector:
         return boxes
 
     @staticmethod
-    def nms(box, scores, thresh):
-        """Non maximum suppression"""
+    def nms(box: torch.Tensor, scores: torch.Tensor, thresh: float) -> list[torch.Tensor]:
+        """
+        Non-maximum suppression to leave bbox
+
+        :param box: original boxes
+        :param scores: scores from model
+        :param thresh: MNS threshold
+        :return:
+            List of bbox to leave
+        """
         x1 = box[:, 0]
         y1 = box[:, 1]
         x2 = box[:, 2]

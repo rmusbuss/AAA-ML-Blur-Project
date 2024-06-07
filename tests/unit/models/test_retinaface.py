@@ -2,8 +2,14 @@
 
 import pytest
 import torch
-from blur.backend.config import (CFG, CONFIDENCE, KEEP_TOP_K, NMS_THRESHOLD,
-                                 TOP_K, VALID_IMAGE_PATH)
+from blur.backend.config import (
+    CFG,
+    CONFIDENCE,
+    KEEP_TOP_K,
+    NMS_THRESHOLD,
+    TOP_K,
+    VALID_IMAGE_PATH,
+)
 from blur.backend.models import FaceDetector
 from PIL import Image
 
