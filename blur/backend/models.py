@@ -43,7 +43,9 @@ class Cascade:
         return f"Cascade model with predict params = {self.predict_params}"
 
     def predict(
-        self, images: list[np.ndarray], idx: np.ndarray | None = None,
+        self,
+        images: list[np.ndarray],
+        idx: np.ndarray | None = None,
     ) -> list[dict]:
         """
         Find faces
@@ -161,7 +163,10 @@ class FaceDetector:
         return output
 
     def post_processor(
-        self, idx: int, model_output: tuple, scales: torch.Tensor,
+        self,
+        idx: int,
+        model_output: tuple,
+        scales: torch.Tensor,
     ) -> torch.Tensor:
         """
         Post-processing of images to enhance results
@@ -251,7 +256,9 @@ class FaceDetector:
         return boxes
 
     @staticmethod
-    def nms(box: torch.Tensor, scores: torch.Tensor, thresh: float) -> list[torch.Tensor]:
+    def nms(
+        box: torch.Tensor, scores: torch.Tensor, thresh: float
+    ) -> list[torch.Tensor]:
         """
         Non-maximum suppression to leave bbox
 
