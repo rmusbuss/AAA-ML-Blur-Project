@@ -19,10 +19,6 @@ from blur.backend.config import (
     NMS_THRESHOLD,
     TOP_K,
     TORCH_WEIGHTS,
-    SCALE_FACTOR,
-    MIN_NEIGHBORS,
-    MIN_SIZE,
-
 )
 from blur.backend.retinaface.core import RetinaFace
 
@@ -33,9 +29,9 @@ class Cascade:
         self.model = cv2.CascadeClassifier(cv2.data.haarcascades + CASCADE_XML)
 
         self.predict_params = {
-            "scaleFactor": SCALE_FACTOR,
-            "minNeighbors": MIN_NEIGHBORS,
-            "minSize": MIN_SIZE,
+            "scaleFactor": 1.21,
+            "minNeighbors": 9,
+            "minSize": (34, 54),
         }
 
         if predict_params is not None:
@@ -105,7 +101,6 @@ class FaceDetector:
             self.model = RetinaFace(cfg=self.cfg)
             self.model.load_state_dict(torch.load(TORCH_WEIGHTS))
             self.model = self.model.to(self.device)
-            self.model.eval()
         else:
             self.model = None
 
