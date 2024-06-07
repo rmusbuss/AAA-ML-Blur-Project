@@ -48,15 +48,22 @@ down:
 
 ## Build backend
 backend-build:
-	docker build -f docker/backend/Dockerfile -t blur-backend:0.1.0 . 
+	docker build \
+	-f docker/backend/Dockerfile \
+	-t blur-backend:0.1.0 .
 
 ## Run backend
 backend-run:
-	docker run -p 8001:8001 -it blur-backend:0.1.0 bash
+	docker run \
+	-p 8001:8001 -p 8002:8002 -p 8003:8003 \
+	-v ./ml_server_triton/models:/models \
+	-it blur-backend:0.1.0 bash
 
 ## Build frontend
 frontend-build:
-	docker build -f docker/frontend/Dockerfile -t blur-frontend:0.1.0 .
+	docker build \
+	-f docker/frontend/Dockerfile \
+	-t blur-frontend:0.1.0 .
 	
 ## Run frontend
 frontend-run:
