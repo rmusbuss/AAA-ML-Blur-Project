@@ -46,6 +46,14 @@ build:
 down:
 	docker-compose down
 
+## Build backend
+backend-build:
+	docker build -f docker/backend/Dockerfile -t backend-frontend .
+
+## Run backend
+backend-run:
+	docker run -p 8001:8001 blur-backend
+
 ## Build frontend
 frontend-build:
 	docker build -f docker/frontend/Dockerfile -t blur-frontend .

@@ -9,11 +9,12 @@ services:
       - "8080:8080"
     image: blur-frontend:0.1.0
 
-#  blur-backend:
-#    build:
-#      context: .
-#      dockerfile: docker/frontend/Dockerfile
-#    ports:
-#      - "3000:3000"
-#    image: blur-backend:0.1.0
-
+  blur-backend:
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+    ports:
+      - "8001:8001"
+      - "8002:8002"
+      - "8003:8003"
+    image: blur-backend:0.1.0
