@@ -1,0 +1,28 @@
+name: "preprocess_model"
+backend: "python"
+max_batch_size: 32
+input [
+  {
+    name: "INPUT"
+    data_type: TYPE_UINT8
+    dims: [-1, -1, 3]  # Переменные размерности
+  }
+]
+output [
+  {
+    name: "OUTPUT0"
+    data_type: TYPE_FP32
+    dims: [3, 840, 840]  # Переменные размерности
+  },
+  {
+    name: "OUTPUT1"
+    data_type: TYPE_FP32
+    dims: [4]  # Переменные размерности
+  }
+]
+instance_group [
+  {
+    kind: KIND_GPU
+    gpus: [ 0 ]
+  }
+]
