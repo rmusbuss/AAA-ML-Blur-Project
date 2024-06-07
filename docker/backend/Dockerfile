@@ -1,18 +1,14 @@
 FROM nvcr.io/nvidia/tritonserver:23.04-py3
 
-WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    && pip install --no-cache-dir torch torchvision
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends && \
-    pip install --no-cache-dir torch torchvision
+RUN mkdir -p /models
 
-RUN mkdir -p blur/backend/retinaface && \
-    mkdir -p blur/backend/triton
-
-COPY blur/backend /app/blur/backend
+WORKDIR /models
 
 EXPOSE 8001
 EXPOSE 8002
 EXPOSE 8003
 
-#CMD ["tritonserver", "--model-repository=/app/blur/backend/triton/models"]
+CMD ["tritonserver", "--model-repository=/models"]
