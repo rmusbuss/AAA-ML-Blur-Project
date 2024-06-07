@@ -1,6 +1,9 @@
 ## Install Python dependencies
 install:
 	@echo "Installing python dependencies..."
+	sudo apt-get install git-lfs
+	git lfs install
+	git lfs pull
 	pip install poetry==1.8.2
 	poetry install
 
