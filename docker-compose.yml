@@ -10,11 +10,20 @@ services:
     image: blur-frontend:0.1.0
 
   blur-backend:
-    build:
-      context: .
-      dockerfile: docker/backend/Dockerfile
+    image: nvcr.io/nvidia/tritonserver:23.04-py3
+    container_name: triton_back
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
     ports:
+      - "8000:8000"
       - "8001:8001"
       - "8002:8002"
-      - "8003:8003"
-    image: blur-backend:0.1.0
+    volumes:
+      - ./ml_server_triton/models:/models
+    command: ["tritonserver", "--model-repository=/models"]
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
