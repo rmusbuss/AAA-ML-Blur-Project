@@ -48,7 +48,7 @@ down:
 
 ## Build backend
 backend-build:
-	docker build -f docker/backend/Dockerfile -t blur-backend:0.1.0 .
+	docker build -f docker/backend/Dockerfile -t blur-backend:0.1.0 . 
 
 ## Run backend
 backend-run:
