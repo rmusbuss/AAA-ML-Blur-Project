@@ -21,5 +21,5 @@ RUN python -m pip install -e .
 
 EXPOSE 8080
 
-#CMD ["python", "run.py"]
+CMD ["python", "run.py"]
 
