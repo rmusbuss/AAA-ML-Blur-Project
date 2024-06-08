@@ -3,17 +3,11 @@
 from itertools import product as product
 from math import ceil
 
-import cv2
 import numpy as np
 import torch
-from blur.backend.config import CASCADE_XML, TORCH_WEIGHTS
-from blur.backend.retinaface.core import RetinaFace
-from tqdm import trange
-
 from PIL import Image
 
 from blur.backend.config import (
-    CASCADE_XML,
     CONFIDENCE,
     KEEP_TOP_K,
     NMS_THRESHOLD,
@@ -21,61 +15,6 @@ from blur.backend.config import (
     TORCH_WEIGHTS,
 )
 from blur.backend.retinaface.core import RetinaFace
-
-
-class Cascade:
-    def __init__(self, predict_params: dict | None = None):
-        """Haar Cascade using OpenCV"""
-        self.model = cv2.CascadeClassifier(cv2.data.haarcascades + CASCADE_XML)
-
-        self.predict_params = {
-            "scaleFactor": 1.21,
-            "minNeighbors": 9,
-            "minSize": (34, 54),
-        }
-
-        if predict_params is not None:
-            self.predict_params.update(predict_params)
-
-    def __repr__(self):
-        return f"Cascade model with predict params = {self.predict_params}"
-
-    def predict(
-        self, images: list[np.ndarray], idx: np.ndarray | None = None
-    ) -> list[dict]:
-        """Make prediction"""
-        
-        assert (images[0].ndim == 3) and (images[0].shape[2] == 3)
-        batch_size = len(images)
-        predictions = []
-        for img_id in range(batch_size):
-            image = images[img_id]
-
-            if idx is not None:
-                assert idx.ndim == 1
-                img_id = idx[img_id]
-
-            faces = self.model.detectMultiScale(
-                image,
-                **self.predict_params,
-            )
-
-            for (x, y, w, h) in faces:
-                predictions.append(
-                    {
-                        "img_id": img_id,
-                        "label": "face",
-                        "confidence": 1.0,
-                        "xmin": x,
-                        "xmax": x + w,
-                        "ymin": y,
-                        "ymax": y + h,
-                        "width": w,
-                        "height": h,
-                    }
-                )
-
-        return predictions
 
 
 class FaceDetector:
@@ -168,19 +107,19 @@ class FaceDetector:
             loc, conf, landmarks = self.model(batch)
 
         output = []
-        for idx in trange(batch_size):
+        for idx in range(batch_size):
             boxes = self.post_processor(idx, loc, conf, landmarks, scales)
             output.append(boxes)
 
         return output
-    
+
     def prior_box(self, image_size=None):
         """
         Prior box realization
-        
+
         Source: https://github.com/fmassa/object-detection.torch
         """
-        
+
         steps = self.cfg["steps"]
         feature_maps = [
             [ceil(image_size[0] / step), ceil(image_size[1] / step)]
@@ -207,7 +146,7 @@ class FaceDetector:
         """
         Decode locations from predictions using priors to undo
         the encoding we did for offset regression at train time.
-        
+
         Source: https://github.com/Hakuyume/chainer-ssd
         """
         variances = self.cfg["variance"]
