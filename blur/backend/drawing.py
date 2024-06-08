@@ -1,15 +1,11 @@
 """Plot functions"""
 
-import os
 import random
-
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 from datasets import DatasetDict
 from PIL import ImageDraw
-from tqdm import tqdm
 
 
 def draw_faces_with_bbox(

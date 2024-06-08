@@ -67,7 +67,7 @@ frontend-build:
 	
 ## Run frontend
 frontend-run:
-	docker run -p 8080:8080 blur-frontend:0.1.0
+	docker run -p 8080:8080 -it blur-frontend:0.1.0 bash
 
 ## Show help
 help:

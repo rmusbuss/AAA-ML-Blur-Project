@@ -1,6 +1,7 @@
 from aiohttp.web import Response, View
 from aiohttp_jinja2 import render_template
 from image import image_to_img_src, open_image
+from mlapi import MLApi
 
 
 class IndexView(View):
@@ -13,11 +14,11 @@ class IndexView(View):
     async def post(self) -> Response:
         try:
             form = await self.request.post()
+            print(form)
             image = open_image(form["image"].file)
-            image_b64 = image_to_img_src(image)
-            ctx = {"image": image_b64, "words": "hello"}
-        except AttributeError as err:
-            ctx = {"error": f"Ошибка при загрузке файла {str(err), type(err)}"}
+            result = MLApi('0.0.0.0').run_model(image)
+            image_b64 = image_to_img_src(result)
+            ctx = {"processed_image": image_b64}
         except Exception as err:
-            ctx = {"error": f"Неожиданная ошибка {str(err), type(err)}"}
+            ctx = {"error": f"Обработка файла не удалась по причине: {err}"}
         return render_template(self.template, self.request, ctx)
