@@ -18,6 +18,8 @@ from blur.backend.retinaface.core import RetinaFace
 
 
 class FaceDetector:
+    """Face Detector model based on RetinaFace"""
+
     def __init__(
         self,
         cfg: dict,
@@ -29,8 +31,8 @@ class FaceDetector:
         is_infer=False
     ):
         """RetinaFace Detector with 5points landmarks"""
-        RetinaFace = None
-        TORCH_WEIGHTS = None
+        # RetinaFace = None
+        # TORCH_WEIGHTS = None
 
         self.cfg = cfg
         self.is_infer = is_infer
@@ -49,7 +51,13 @@ class FaceDetector:
         self.keep_top_k = keep_top_k
 
     def pre_processor(self, img):
-        """Process image to the necessary format"""
+        """
+        Pre-process image to the necessary format
+
+        :param img: PIL Image
+        :return:
+            Scaled image and scale info
+        """
         W, H = img.size
         scale = torch.Tensor([W, H, W, H]).to(self.device)
         img = img.resize(
@@ -61,7 +69,18 @@ class FaceDetector:
         return img, scale
 
     def post_processor(self, idx, loc, conf, landmarks, scales):
-        """Post processing of images to enhance results"""
+        """
+        Post-processing of images to enhance results
+
+        :param idx: image id
+        :param loc: result of self.model(batch)[0]
+        :param conf: result of self.model(batch)[1]
+        :param landmarks: result of self.model(batch)[2]
+        :param scales: scales info from `pre-processor`
+        :return:
+            Boxes with faces on image
+        """
+
         priors = self.prior_box(
             image_size=(self.cfg["image_size"], self.cfg["image_size"]),
         ).to(self.device)
@@ -91,7 +110,13 @@ class FaceDetector:
         return boxes
 
     def detect(self, images: list):
-        """Entry point for prediction"""
+        """
+        Entry point for prediction
+
+        :param images: list of PIL images
+        :return:
+            List of predictions [boxes]
+        """
         batch_size = len(images)
         batch, scales = [], []
 
@@ -115,11 +140,9 @@ class FaceDetector:
 
     def prior_box(self, image_size=None):
         """
-        Prior box realization
-
+        Prior-box realization
         Source: https://github.com/fmassa/object-detection.torch
         """
-
         steps = self.cfg["steps"]
         feature_maps = [
             [ceil(image_size[0] / step), ceil(image_size[1] / step)]
@@ -146,8 +169,12 @@ class FaceDetector:
         """
         Decode locations from predictions using priors to undo
         the encoding we did for offset regression at train time.
-
         Source: https://github.com/Hakuyume/chainer-ssd
+
+        :param loc: locations
+        :param priors: result of self.prior_box()
+        :return:
+            Decoded boxes
         """
         variances = self.cfg["variance"]
         boxes = torch.cat(
@@ -163,7 +190,15 @@ class FaceDetector:
 
     @staticmethod
     def nms(box, scores, thresh):
-        """Non maximum suppression"""
+        """
+        Non-maximum suppression to leave bbox
+
+        :param box: original boxes
+        :param scores: scores from model
+        :param thresh: MNS threshold
+        :return:
+            List of bbox to leave
+        """
         x1 = box[:, 0]
         y1 = box[:, 1]
         x2 = box[:, 2]

@@ -10,7 +10,7 @@ from blur.backend.config import (
     TOP_K,
     VALID_IMAGE_PATH,
 )
-from blur.backend.models import FaceDetector
+from blur.backend.retinaface.detector import FaceDetector
 from PIL import Image
 
 
@@ -23,6 +23,7 @@ def face_detector():
         nms_threshold=NMS_THRESHOLD,
         top_k=TOP_K,
         keep_top_k=KEEP_TOP_K,
+        is_infer=False,
     )
 
 

@@ -1,9 +1,5 @@
-import sys
-sys.path.append('/app/')
-sys.path.append('/home/yaroslav/progs/final_ml_fin_proj/AAA-ML-Blur-Project')
-
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageFilter
 import torch
 import tritonclient.grpc as grpcclient
 
@@ -17,10 +13,8 @@ class MLApi:
         self.facedet = FaceDetector(cfg=CFG, is_infer=True)
 
     def convert_bbox(self, x, y, width, height):
-        x_min = x
-        y_min = y
-        x_max = x + width
-        y_max = y + height
+        x_min, y_min = x, y
+        x_max, y_max = x + width, y + height
         return x_min, y_min, x_max, y_max
 
     def blur_image(self, image: Image, coords, sigma=52, is_coords=False):

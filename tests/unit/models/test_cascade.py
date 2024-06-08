@@ -9,7 +9,7 @@ from blur.backend.config import (
     SCALE_FACTOR,
     VALID_IMAGE_PATH,
 )
-from blur.backend.models import Cascade
+from blur.backend.cascade.cascade import Cascade
 
 
 @pytest.fixture

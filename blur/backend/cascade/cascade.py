@@ -3,18 +3,25 @@
 import cv2
 import numpy as np
 
-from blur.backend.config import CASCADE_XML
+from blur.backend.config import (
+    CASCADE_XML,
+    SCALE_FACTOR,
+    MIN_NEIGHBORS,
+    MIN_SIZE,
+)
 
 
 class Cascade:
+    """Haar Cascade using OpenCV"""
+
     def __init__(self, predict_params: dict | None = None):
-        """Haar Cascade using OpenCV"""
+
         self.model = cv2.CascadeClassifier(cv2.data.haarcascades + CASCADE_XML)
 
         self.predict_params = {
-            "scaleFactor": 1.21,
-            "minNeighbors": 9,
-            "minSize": (34, 54),
+            "scaleFactor": SCALE_FACTOR,
+            "minNeighbors": MIN_NEIGHBORS,
+            "minSize": MIN_SIZE,
         }
 
         if predict_params is not None:
@@ -24,10 +31,19 @@ class Cascade:
         return f"Cascade model with predict params = {self.predict_params}"
 
     def predict(
-        self, images: list[np.ndarray], idx: np.ndarray | None = None
+        self,
+        images: list[np.ndarray],
+        idx: np.ndarray | None = None,
     ) -> list[dict]:
-        """Make prediction"""
-        
+        """
+        Find faces
+
+        :param images: list on images in np.ndarray
+        :param idx: image idx (optional)
+        :return:
+            List of faces info for all images
+        """
+
         assert (images[0].ndim == 3) and (images[0].shape[2] == 3)
         batch_size = len(images)
         predictions = []
@@ -57,5 +73,4 @@ class Cascade:
                         "height": h,
                     }
                 )
-
         return predictions
