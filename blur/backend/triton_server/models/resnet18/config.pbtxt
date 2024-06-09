@@ -28,5 +28,7 @@ dims: [29126, 10]
 instance_group [
   {
     kind: KIND_GPU
-  }
+  },
+  { count: 2 }
 ]
+dynamic_batching { }
