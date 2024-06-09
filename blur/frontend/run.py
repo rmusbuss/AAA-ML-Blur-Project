@@ -1,3 +1,5 @@
+"""Entry point for frontend"""
+
 from aiohttp.web import run_app
 from app import create_app
 from config import PORT

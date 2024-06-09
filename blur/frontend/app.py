@@ -1,3 +1,5 @@
+"""App core"""
+
 import aiohttp_jinja2
 import jinja2
 from aiohttp.web import Application
@@ -6,6 +8,8 @@ from views import IndexView
 
 
 def create_app() -> Application:
+    """Create `aiohttp` app"""
+
     app = Application(client_max_size=1024**2 * 50)
 
     # setup routes
@@ -17,10 +21,9 @@ def create_app() -> Application:
         app=app,
         loader=jinja2.FileSystemLoader(TEMPLATES_PATH),
     )
-    # app["model"] = create_model()
     return app
 
 
 async def async_create_app() -> Application:
+    """Run App"""
     return create_app()
-

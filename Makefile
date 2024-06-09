@@ -39,10 +39,11 @@ test:
 ## Run tests
 tests: test
 
-## Build
+## Build containers
 build:
 	docker-compose up -d
 
+## Down containers
 down:
 	docker-compose down
 

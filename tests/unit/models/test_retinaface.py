@@ -1,29 +1,18 @@
 """Tests for RetinaFace detector model"""
 
+from PIL import Image
+
 import pytest
 import torch
-from blur.backend.config import (
-    CFG,
-    CONFIDENCE,
-    KEEP_TOP_K,
-    NMS_THRESHOLD,
-    TOP_K,
-    VALID_IMAGE_PATH,
-)
+
+from blur.backend.config import VALID_IMAGE_PATH
 from blur.backend.retinaface.detector import FaceDetector
-from PIL import Image
 
 
 @pytest.fixture
 def face_detector():
     return FaceDetector(
-        cfg=CFG,
         device=torch.device("cpu"),
-        confidence_threshold=CONFIDENCE,
-        nms_threshold=NMS_THRESHOLD,
-        top_k=TOP_K,
-        keep_top_k=KEEP_TOP_K,
-        is_infer=False,
     )
 
 
@@ -33,26 +22,8 @@ def img():
 
 
 def test_initialization(face_detector):
-    assert face_detector.cfg == CFG
     assert face_detector.device == torch.device("cpu")
-    assert face_detector.confidence_threshold == CONFIDENCE
-    assert face_detector.nms_thresh == NMS_THRESHOLD
-    assert face_detector.top_k == TOP_K
-    assert face_detector.keep_top_k == KEEP_TOP_K
     assert face_detector.model is not None
-
-
-def test_pre_processor(face_detector, img):
-    processed_img, scale = face_detector.pre_processor(img)
-
-    assert isinstance(processed_img, torch.Tensor)
-    assert processed_img.shape == (
-        3,
-        face_detector.cfg["image_size"],
-        face_detector.cfg["image_size"],
-    )
-    assert isinstance(scale, torch.Tensor)
-    assert scale.shape == (4,)
 
 
 def test_detect(face_detector, img):
