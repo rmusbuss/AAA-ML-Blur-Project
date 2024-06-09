@@ -1,7 +1,8 @@
 """Image utils to work with frontend"""
 
-from io import BufferedReader, BytesIO
 from base64 import b64encode
+from io import BufferedReader, BytesIO
+
 from PIL import Image
 
 
@@ -11,7 +12,7 @@ def open_image(image_fp: BufferedReader) -> Image:
 
 
 def image_b64encode(image: Image) -> str:
-    """"Decode image"""
+    """Decode image"""
 
     with BytesIO() as io:
         image.save(io, format="png", quality=100)

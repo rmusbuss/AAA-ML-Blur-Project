@@ -15,4 +15,3 @@ TRITON_PORT = 8001
 
 # Constants
 PORT = 8080
-

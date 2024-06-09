@@ -1,9 +1,8 @@
 """Tests for RetinaFace detector model"""
 
-from PIL import Image
-
 import pytest
 import torch
+from PIL import Image
 
 from blur.backend.config import VALID_IMAGE_PATH
 from blur.backend.retinaface.detector import FaceDetector

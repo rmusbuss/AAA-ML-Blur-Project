@@ -8,6 +8,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torchvision.models as models
 import torchvision.models._utils as _utils
+
 from blur.backend.retinaface.net import FPN as FPN
 from blur.backend.retinaface.net import SSH as SSH
 
@@ -99,21 +100,27 @@ class RetinaFace(nn.Module):
         )
 
     @staticmethod
-    def _make_class_head(fpn_num: int = 3, inchannels: int = 64, anchor_num: int = 2):
+    def _make_class_head(
+        fpn_num: int = 3, inchannels: int = 64, anchor_num: int = 2
+    ):
         classhead = nn.ModuleList()
         for i in range(fpn_num):
             classhead.append(ClassHead(inchannels, anchor_num))
         return classhead
 
     @staticmethod
-    def _make_bbox_head(fpn_num: int = 3, inchannels: int = 64, anchor_num: int = 2):
+    def _make_bbox_head(
+        fpn_num: int = 3, inchannels: int = 64, anchor_num: int = 2
+    ):
         bboxhead = nn.ModuleList()
         for i in range(fpn_num):
             bboxhead.append(BboxHead(inchannels, anchor_num))
         return bboxhead
 
     @staticmethod
-    def _make_landmark_head(fpn_num: int = 3, inchannels: int = 64, anchor_num: int = 2):
+    def _make_landmark_head(
+        fpn_num: int = 3, inchannels: int = 64, anchor_num: int = 2
+    ):
         landmarkhead = nn.ModuleList()
         for i in range(fpn_num):
             landmarkhead.append(LandmarkHead(inchannels, anchor_num))

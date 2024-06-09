@@ -5,9 +5,9 @@ import numpy as np
 
 from blur.backend.config import (
     CASCADE_XML,
-    SCALE_FACTOR,
     MIN_NEIGHBORS,
     MIN_SIZE,
+    SCALE_FACTOR,
 )
 
 

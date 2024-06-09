@@ -1,8 +1,9 @@
-from PIL import Image
-import torch
 import pytest
-from blur.processor_utils import Processor
+import torch
+from PIL import Image
+
 from blur.backend.config import VALID_IMAGE_PATH
+from blur.processor_utils import Processor
 
 
 @pytest.fixture
