@@ -13,7 +13,7 @@ from blur.backend.retinaface.net import SSH as SSH
 
 
 class ClassHead(nn.Module):
-    def __init__(self, inchannels=512, num_anchors=3):
+    def __init__(self, inchannels: int = 512, num_anchors: int = 3):
         super(ClassHead, self).__init__()
         self.num_anchors = num_anchors
         self.conv1x1 = nn.Conv2d(
@@ -32,7 +32,7 @@ class ClassHead(nn.Module):
 
 
 class BboxHead(nn.Module):
-    def __init__(self, inchannels=512, num_anchors=3):
+    def __init__(self, inchannels: int = 512, num_anchors: int = 3):
         super(BboxHead, self).__init__()
         self.conv1x1 = nn.Conv2d(
             inchannels, num_anchors * 4, kernel_size=(1, 1), stride=1, padding=0
@@ -46,7 +46,7 @@ class BboxHead(nn.Module):
 
 
 class LandmarkHead(nn.Module):
-    def __init__(self, inchannels=512, num_anchors=3):
+    def __init__(self, inchannels: int = 512, num_anchors: int = 3):
         super(LandmarkHead, self).__init__()
         self.conv1x1 = nn.Conv2d(
             inchannels,
@@ -64,7 +64,7 @@ class LandmarkHead(nn.Module):
 
 
 class RetinaFace(nn.Module):
-    def __init__(self, cfg=None, phase="train"):
+    def __init__(self, cfg: dict, phase: str = "train"):
         """
         :param cfg:  Network related settings.
         :param phase: train or test.
@@ -98,19 +98,22 @@ class RetinaFace(nn.Module):
             fpn_num=3, inchannels=cfg["out_channel"]
         )
 
-    def _make_class_head(self, fpn_num=3, inchannels=64, anchor_num=2):
+    @staticmethod
+    def _make_class_head(fpn_num: int = 3, inchannels: int = 64, anchor_num: int = 2):
         classhead = nn.ModuleList()
         for i in range(fpn_num):
             classhead.append(ClassHead(inchannels, anchor_num))
         return classhead
 
-    def _make_bbox_head(self, fpn_num=3, inchannels=64, anchor_num=2):
+    @staticmethod
+    def _make_bbox_head(fpn_num: int = 3, inchannels: int = 64, anchor_num: int = 2):
         bboxhead = nn.ModuleList()
         for i in range(fpn_num):
             bboxhead.append(BboxHead(inchannels, anchor_num))
         return bboxhead
 
-    def _make_landmark_head(self, fpn_num=3, inchannels=64, anchor_num=2):
+    @staticmethod
+    def _make_landmark_head(fpn_num: int = 3, inchannels: int = 64, anchor_num: int = 2):
         landmarkhead = nn.ModuleList()
         for i in range(fpn_num):
             landmarkhead.append(LandmarkHead(inchannels, anchor_num))

@@ -16,7 +16,7 @@ class IndexView(View):
             form = await self.request.post()
             print(form)
             image = open_image(form["image"].file)
-            result = MLApi('aaa-ml-blur-project_blur-backend_1').run_model(image)
+            result = MLApi().run_model(image)
             image_b64 = image_to_img_src(result)
             ctx = {"processed_image": image_b64}
         except Exception as err:

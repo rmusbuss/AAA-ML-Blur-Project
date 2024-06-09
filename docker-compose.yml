@@ -34,7 +34,7 @@ services:
               count: 1
               capabilities: [gpu]
     volumes:
-      - ./ml_server_triton/models:/models
+      - ./blur/backend/triton_server/models:/models
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
     image: blur-backend:0.1.0

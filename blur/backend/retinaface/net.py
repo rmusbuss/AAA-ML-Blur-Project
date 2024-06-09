@@ -8,7 +8,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-def conv_bn(inp, oup, stride=1, leaky=0):
+def conv_bn(inp: int, oup: int, stride: int = 1, leaky: float = 0):
     return nn.Sequential(
         nn.Conv2d(inp, oup, 3, stride, 1, bias=False),
         nn.BatchNorm2d(oup),
@@ -16,14 +16,14 @@ def conv_bn(inp, oup, stride=1, leaky=0):
     )
 
 
-def conv_bn_no_relu(inp, oup, stride):
+def conv_bn_no_relu(inp: int, oup: int, stride: int):
     return nn.Sequential(
         nn.Conv2d(inp, oup, 3, stride, 1, bias=False),
         nn.BatchNorm2d(oup),
     )
 
 
-def conv_bn1X1(inp, oup, stride, leaky=0):
+def conv_bn1X1(inp: int, oup: int, stride: int, leaky: float = 0):
     return nn.Sequential(
         nn.Conv2d(inp, oup, 1, stride, padding=0, bias=False),
         nn.BatchNorm2d(oup),
@@ -31,7 +31,7 @@ def conv_bn1X1(inp, oup, stride, leaky=0):
     )
 
 
-def conv_dw(inp, oup, stride, leaky=0.1):
+def conv_dw(inp: int, oup: int, stride: int, leaky: float = 0.1):
     return nn.Sequential(
         nn.Conv2d(inp, inp, 3, stride, 1, groups=inp, bias=False),
         nn.BatchNorm2d(inp),
@@ -43,7 +43,7 @@ def conv_dw(inp, oup, stride, leaky=0.1):
 
 
 class SSH(nn.Module):
-    def __init__(self, in_channel, out_channel):
+    def __init__(self, in_channel: int, out_channel: int):
         super(SSH, self).__init__()
         assert out_channel % 4 == 0
         leaky = 0
@@ -80,7 +80,7 @@ class SSH(nn.Module):
 
 
 class FPN(nn.Module):
-    def __init__(self, in_channels_list, out_channels):
+    def __init__(self, in_channels_list: list, out_channels: int):
         super(FPN, self).__init__()
         leaky = 0
         if out_channels <= 64:
