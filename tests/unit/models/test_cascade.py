@@ -3,13 +3,14 @@
 import cv2
 import numpy as np
 import pytest
+
+from blur.backend.cascade.cascade import Cascade
 from blur.backend.config import (
     MIN_NEIGHBORS,
     MIN_SIZE,
     SCALE_FACTOR,
     VALID_IMAGE_PATH,
 )
-from blur.backend.cascade.cascade import Cascade
 
 
 @pytest.fixture

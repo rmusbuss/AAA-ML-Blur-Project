@@ -1,12 +1,12 @@
-"""Models Core"""
+"""Detector based on RetinaFace"""
 
 from typing import Optional
 
 import torch
 
-from blur.backend.retinaface.core import RetinaFace
 from blur.backend.config import TORCH_WEIGHTS
-from blur.processor_utils import Processor, PROCESSOR_CONFIG
+from blur.backend.retinaface.core import RetinaFace
+from blur.processor_utils import PROCESSOR_CONFIG, Processor
 
 
 class FaceDetector:
@@ -14,7 +14,9 @@ class FaceDetector:
 
     def __init__(self, device: Optional[torch.device] = None):
         if device is None:
-            self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+            self.device = torch.device(
+                "cuda:0" if torch.cuda.is_available() else "cpu"
+            )
         else:
             self.device = device
 

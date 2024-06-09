@@ -1,13 +1,12 @@
 """Processor core for image pre- & post- resize"""
 
 from itertools import product as product
-from typing import Optional
 from math import ceil
+from typing import Optional
 
-import torch
 import numpy as np
+import torch
 from PIL import Image
-
 
 PROCESSOR_CONFIG = {
     "min_sizes": [[16, 32], [64, 128], [256, 512]],
@@ -18,22 +17,22 @@ PROCESSOR_CONFIG = {
     "return_layers": {"layer2": 1, "layer3": 2, "layer4": 3},
     "in_channel": 256,
     "out_channel": 256,
-
     # Post-processing
     "confidence": 0.99,
     "nms_threshold": 0.4,
     "top_k": 5000,
-    "keep_top_k": 750
+    "keep_top_k": 750,
 }
 
 
 class Processor:
-
     def __init__(self, device: Optional[torch.device] = None):
         self.cfg = PROCESSOR_CONFIG
 
         if device is None:
-            self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+            self.device = torch.device(
+                "cuda:0" if torch.cuda.is_available() else "cpu"
+            )
         else:
             self.device = device
 
@@ -97,10 +96,13 @@ class Processor:
         Prior-box realization
         Source: https://github.com/fmassa/object-detection.torch
         """
-        steps, all_min_sizes, image_size = self.cfg["steps"], self.cfg["min_sizes"], self.cfg["image_size"]
+        steps, all_min_sizes, image_size = (
+            self.cfg["steps"],
+            self.cfg["min_sizes"],
+            self.cfg["image_size"],
+        )
         feature_maps = [
-            [ceil(image_size / step), ceil(image_size / step)]
-            for step in steps
+            [ceil(image_size / step), ceil(image_size / step)] for step in steps
         ]
 
         anchors = []

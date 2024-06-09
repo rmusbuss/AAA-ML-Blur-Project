@@ -277,4 +277,7 @@ data/WIDER_FACE
 data/CUSTOM_FACE
 .idea
 
+# Models
+*.onnx
+
 # End of https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks,pycharm+all

@@ -3,14 +3,14 @@
 import aiohttp_jinja2
 import jinja2
 from aiohttp.web import Application
-from config import TEMPLATES_PATH, STATIC_PATH
+from config import STATIC_PATH, TEMPLATES_PATH
 from views import IndexView
 
 
 def create_app() -> Application:
     """Create `aiohttp` app"""
 
-    app = Application(client_max_size=1024**2 * 50)
+    app = Application(client_max_size=1024 ** 2 * 50)
 
     # setup routes
     app.router.add_static("/static/", STATIC_PATH)
