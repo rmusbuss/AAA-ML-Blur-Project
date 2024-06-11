@@ -14,7 +14,6 @@ class IndexView(View):
     async def post(self) -> Response:
         try:
             form = await self.request.post()
-            print(form)
             image = open_image(form["image"].file)
             result = MLApi().run_model(image)
             image_b64 = image_to_img_src(result)
